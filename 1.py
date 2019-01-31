@@ -142,6 +142,6 @@ class main(object):
 if __name__ == '__main__':
     HOST = '0.0.0.0'
     file_no = '4.0'
-    PORT = 6671
+    PORT = 8888
     ADDR = (HOST, PORT)
     main(ADDR,file_no)
