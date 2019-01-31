@@ -49,27 +49,64 @@ class main(object):
                 self.file_no_check(c,l)
             elif l[0] == 'G':
                 self.sendfile(c,l)
+            elif l[0] == 'R':
+                self.do_register(c,l)
+            elif l[0] == 'I':
+                self.do_login(c,l)
+
+    def do_login(self,c,l):
+        c_id = l[1]
+        c_passw = l[2]
+        conn = MongoClient('localhost', 27017)
+        db = conn['text']
+        myset = db['account']
+        a = myset.find({})
+        for i in a:
+            if i['id'] == c_id and i['passw'] == c_passw:
+                c.send(b'OK')
+                return
+        else:
+            msg = '账号或密码不正确'
+            c.send(msg.encode())
+
+
+
+    def do_register(self,c,l):
+        c_id = l[1]
+        c_name =l[2]
+        c_passw = l[3]
+        conn = MongoClient('localhost', 27017)
+        db = conn['text']
+        myset = db['account']
+        a = myset.find({})
+        for i in a:
+            if i['name'] == c_name or i['id'] == c_id:
+                data = '用户名或昵称已被使用'
+                c.send(data.encode())
+                return
+
+        myset.insert_one({'id': '%s'%c_id, 'name': '%s'%c_name, 'passw': '%s'%c_passw})
+        c.send(b'OK')
+        conn.close()
+
+
     def sendfile(self,c,l):
         filename= l[1]
-        print(filename)
         try:
             fb = open(filename, 'rb')
         except Exception:
             c.send('文件不存在'.encode())
-            print('文件不存在')
             return
         c.send(b'OK')
         time.sleep(0.1)
         while True:
             data = fb.read(1024)
-            print(data)
             if not data:
                 time.sleep(0.1)
                 c.send(b'###')
                 break
             c.send(data)
-            print('sending',data)
-        print('send finished')
+
 
     def file_no_check(self,c,l):
         data = self.file_no
@@ -84,8 +121,6 @@ class main(object):
         for i in a:
             l.append(i)
         ro = randint(0,len(l)-1)
-        print(l[ro]['Ask'])
-        print(l[ro]['Answer'])
         data = "%s##%s"%(l[ro]['Ask'],l[ro]['Answer'])
         time.sleep(0.1)
         c.send(data.encode())

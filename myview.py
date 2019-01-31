@@ -4,6 +4,29 @@ import sys
 import time
 from socket import *
 from tkinter import ttk
+from random import randint
+
+class Do_random(Frame):
+    def __init__(self,master):
+        Frame.__init__(self,master)
+        self.create_page()
+
+    def create_page(self):
+        def dorandom():
+            no = randint(start.get(),end.get())
+            Label(self,text='恭喜 %s 号同学！！'%no,pady='50',font=('Calibri',30)).grid(row=4, column=1,columnspan=3)
+
+        start = IntVar()
+        end = IntVar()
+        start.set(1)
+        end.set(17)
+        Label(self,pady='10').grid(row=0, column=1)
+        Label(self,text='随机起始值',pady='10').grid(row=1,column=1)
+        Label(self, text='随机终止值',pady='10').grid(row=2, column=1)
+        Entry(self,textvariable=start).grid(row=1,column=2)
+        Entry(self, textvariable=end).grid(row=2, column=2)
+        Button(self,text='随机选个号',command=dorandom,pady='30',font=('Calibri',12)).grid(row=3, column=1)
+
 
 
 class InputFrame(Frame):
