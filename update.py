@@ -1,3 +1,4 @@
+# coding=utf-8
 from socket import *
 import os
 from time import sleep
@@ -33,8 +34,8 @@ def main(addr,filename):
 
 if __name__ == '__main__':
     print("updata is running")
-    addr = ('176.136.4.36',6671)
-    filename= ['main.py','main_menu.py','login.py','myview.py','1.py']
+    addr = ('39.108.82.241',8888)
+    filename= ['main.py','main_menu.py','login.py','myview.py','1.py','update.py']
     for i in filename:
         sleep(0.5)
         main(addr,i)
