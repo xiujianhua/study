@@ -43,7 +43,7 @@ class main(object):
                 sys.exit('客户端退出')
             l = data.split('##')
             if l[0] == 'S':
-                self.db_insert(l)
+                self.db_insert(c,l)
             elif l[0] == 'L':
                 self.db_load(c,l)
             elif l[0] == 'U':
@@ -122,26 +122,53 @@ class main(object):
         for i in a:
             l.append(i)
         ro = randint(0,len(l)-1)
-        data = "%s##%s"%(l[ro]['Ask'],l[ro]['Answer'])
+        dd = l[ro]
+        try:
+            dd['Name']
+        except:
+            dd['Name'] = '未名'
+        try:
+            dd['Type']
+        except:
+            dd['Type'] = '无型'
+        try:
+            dd['Ask']
+        except:
+            dd['Ask'] = '莫问'
+        try:
+            dd['Answer']
+        except:
+            dd['Answer'] = '非答'
+        data = "%s##%s##%s##%s"%(dd['Ask'],dd['Answer'],dd['Type'],dd['Name'])
         time.sleep(0.1)
         c.send(data.encode())
         conn.close()
 
 
-    def db_insert(self, l):
+    def db_insert(self, c,l):
         conn = MongoClient('localhost', 27017)
         db = conn['text']
         myset = db['season2']
-        myset.insert_one({'Ask': '%s' % l[2],'Answer': '%s' % l[3],'Type': '%s' % l[1]})
+        try:
+            myset.insert_one({'Name':'%s'%l[2], 'Ask': '%s' % l[3],'Answer': '%s' % l[4],'Type': '%s' % l[1]})
+            c.send(b'OK')
+        except Exception as e:
+            data = 'error:%s'%e
+            c.send(data.encode())
+            return
         a = myset.find({}, {'_id': 0})
         for i in a:
-            print(i)
+            try:
+                if i['Ask'] == l[3]:
+                    print('get!',l[3],i)
+            except:
+                pass
         conn.close()
 
 
 if __name__ == '__main__':
     HOST = '0.0.0.0'
-    file_no = '4.0'
+    file_no = '5.0'
     PORT = 8888
     ADDR = (HOST, PORT)
     main(ADDR,file_no)
